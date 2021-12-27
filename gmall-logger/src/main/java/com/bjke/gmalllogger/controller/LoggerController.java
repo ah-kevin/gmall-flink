@@ -17,4 +17,13 @@ public class LoggerController {
     public String test2(@RequestParam("name") String nn) {
         return nn;
     }
+
+    @RequestMapping("applog")
+    public String getLog(@RequestParam("param") String jsonStr) {
+        System.out.println(jsonStr);
+        // 数据落盘
+
+        // 数据写入kafka
+        return "success";
+    }
 }
