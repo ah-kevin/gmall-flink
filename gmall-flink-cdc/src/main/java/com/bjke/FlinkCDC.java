@@ -1,8 +1,8 @@
 package com.bjke;
 
-import com.alibaba.ververica.cdc.connectors.mysql.MySQLSource;
-import com.alibaba.ververica.cdc.debezium.DebeziumSourceFunction;
-import com.alibaba.ververica.cdc.debezium.StringDebeziumDeserializationSchema;
+
+import com.ververica.cdc.connectors.mysql.source.MySqlSource;
+import com.ververica.cdc.debezium.StringDebeziumDeserializationSchema;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -13,7 +13,7 @@ public class FlinkCDC {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
         // 2。通过flinkCDC构建sourceFunction并读取数据
-        DebeziumSourceFunction<String> sourceFunction = MySQLSource.<String>builder()
+        MySqlSource<String> mySqlSource = MySqlSource.<String>builder()
                 .hostname("localhost")
                 .port(3306)
                 .databaseList("gmall-flink")
@@ -22,10 +22,12 @@ public class FlinkCDC {
                 .password("890728")
                 .deserializer(new StringDebeziumDeserializationSchema())
                 .build();
-//        DataStreamSource<String> streamSource = env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), "mysql source");
-        DataStreamSource<String> streamSource = env.addSource(sourceFunction);
+        DataStreamSource<String> streamSource = env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), "MySQL Source");
+
         // 3。 打印
-        streamSource.print();
+        streamSource
+                .setParallelism(4) // set 4 parallel source tasks
+                .print().setParallelism(1); // use parallelism 1 for sink to keep message ordering
         // 4。启动
         env.execute("FlinkCDC");
     }
