@@ -8,7 +8,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import java.util.Properties;
 
 public class MyKafkaUtil {
-    private static final String brokers = "hadoop1:9092";
+    private static final String brokers = "hadoop1:9092,hadoop2:9092,hadoop3:9092";
 
     public static FlinkKafkaProducer<String> getKafkaProducer(String topic) {
         return new FlinkKafkaProducer<String>(brokers, topic, new SimpleStringSchema());

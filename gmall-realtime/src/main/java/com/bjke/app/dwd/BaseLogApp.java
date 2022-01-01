@@ -16,6 +16,11 @@ import org.apache.flink.streaming.api.functions.ProcessFunction;
 import org.apache.flink.util.Collector;
 import org.apache.flink.util.OutputTag;
 
+/**
+ * 数据流: web/app -> nginx -> SpringBoot -> kafka(ods) -> FlinkApp -> kafka(dwd)
+ * <p>
+ * 程  序: mockLog -> nginx -> Logger.sh  -> kafka(zk) -> BaseLogApp -> kafka
+ */
 public class BaseLogApp {
     public static void main(String[] args) throws Exception {
         // 1. 获取执行环境
@@ -118,9 +123,9 @@ public class BaseLogApp {
         pageDS$.print("Page>>>>>>");
         display$.print("display>>>>>>");
 
-//        start$.addSink(MyKafkaUtil.getKafkaProducer("dwd_start_log"));
-//        pageDS$.addSink(MyKafkaUtil.getKafkaProducer("dwd_page_log"));
-//        display$.addSink(MyKafkaUtil.getKafkaProducer("dwd_display_log"));
+        start$.addSink(MyKafkaUtil.getKafkaProducer("dwd_start_log"));
+        pageDS$.addSink(MyKafkaUtil.getKafkaProducer("dwd_page_log"));
+        display$.addSink(MyKafkaUtil.getKafkaProducer("dwd_display_log"));
 
         // 8。启动任务
         env.execute("BaseLogApp");
