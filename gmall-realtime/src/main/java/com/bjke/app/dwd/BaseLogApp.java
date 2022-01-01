@@ -24,11 +24,21 @@ import org.apache.flink.util.OutputTag;
 public class BaseLogApp {
     public static void main(String[] args) throws Exception {
         // 1. 获取执行环境
-        // 1。获取执行环境
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        env.setParallelism(1);
-        // 开启ck并指定状态后端为FS
-//        env.enableCheckpointing(3000);
+        env.setParallelism(1); //生产环境应该设置为Kafka主题的分区数
+        //2.Flink-CDC将读取binlog的位置信息以状态的方式保存在CK,如果想要做到断点续传,需要从Checkpoint或者Savepoint启动程序
+        //2.1 开启Checkpoint,每隔5秒钟做一次CK
+//        env.enableCheckpointing(5000L);
+//        //2.2 指定CK的一致性语义
+//        env.getCheckpointConfig().setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE);
+//        //2.3 设置任务关闭的时候保留最后一次CK数据
+//        env.getCheckpointConfig().enableExternalizedCheckpoints(CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
+//        //2.4 指定从CK自动重启策略
+//        env.setRestartStrategy(RestartStrategies.fixedDelayRestart(3, 2000L));
+//        //2.5 设置状态后端
+//        env.setStateBackend(new FsStateBackend("hdfs://hadoop1:8020/flinkCDC"));
+//        //2.6 设置访问HDFS的用户名
+//        System.setProperty("HADOOP_USER_NAME", "root");
 
         // 2。 消费ods_base_log 主题数据创建流
         String sourceTopic = "ods_base_log";

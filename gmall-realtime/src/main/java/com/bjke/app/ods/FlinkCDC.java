@@ -20,7 +20,7 @@ public class FlinkCDC {
 
         // 2。通过flinkCDC构建sourceFunction并读取数据
         MySqlSource<String> mySqlSource = MySqlSource.<String>builder()
-                .hostname("172.19.1.35")
+                .hostname("localhost")
                 .port(3306)
                 .databaseList("gmall-flink")
                 .tableList() // 如果不添加该参数，则消费制定数据库中所有表的数据，如果制定，指定方式为table.name
