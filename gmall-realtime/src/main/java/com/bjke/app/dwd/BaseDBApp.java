@@ -2,6 +2,7 @@ package com.bjke.app.dwd;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.bjke.app.function.DimSinkFunction;
 import com.bjke.app.function.TableProcessFunction;
 import com.bjke.bean.TableProcess;
 import com.bjke.utils.MyKafkaUtil;
@@ -13,8 +14,17 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.state.MapStateDescriptor;
 import org.apache.flink.streaming.api.datastream.*;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.connectors.kafka.KafkaSerializationSchema;
 import org.apache.flink.util.OutputTag;
+import org.apache.kafka.clients.producer.ProducerRecord;
 
+import javax.annotation.Nullable;
+
+/**
+ * 数据流: web/app -> nginx -> SpringBoot -> Mysql -> FlinkApp -> kafka(ods) -> FlinkApp -> Kafka(dwd)/Phoenix(dim)
+ * <p>
+ * 程  序:            mockDb              -> Mysql -> FlinkCDC  -> kafka(zk) -> BaseDBApp -> kafka/Phoenix(hbase,zk,hdfs)
+ */
 public class BaseDBApp {
     public static void main(String[] args) throws Exception {
         // 1. 获取执行环境
@@ -76,6 +86,14 @@ public class BaseDBApp {
         // 8。将kafka数据写入kafka主题，将Hbase数据写入Phoenix表
         kafka.print("Kafka>>>>>>>");
         hbase.print("Hbase>>>>>>>");
+        hbase.addSink(new DimSinkFunction());
+//        kafka.map(JSONAware::toJSONString).addSink(MyKafkaUtil.getKafkaProducer(""));
+        kafka.addSink(MyKafkaUtil.getKafkaProducer(new KafkaSerializationSchema<JSONObject>() {
+            @Override
+            public ProducerRecord<byte[], byte[]> serialize(JSONObject element, @Nullable Long timestamp) {
+                return new ProducerRecord<byte[], byte[]>(element.getString("sinkTable"), element.getString("after").getBytes());
+            }
+        }));
         // 9。启动任务
         env.execute("BaseDBApp");
     }
