@@ -38,6 +38,7 @@ public class TableProcessFunction extends BroadcastProcessFunction<JSONObject, S
     }
 
     // value:{"db":"","ts_ms":{},"before":{},"after":{},"op":{},"source":{}}
+    // table_process的数据
     @Override
     public void processBroadcastElement(String value, BroadcastProcessFunction<JSONObject, String, JSONObject>.Context ctx, Collector<JSONObject> out) throws Exception {
         // 1. 获取并解析数据
@@ -50,7 +51,7 @@ public class TableProcessFunction extends BroadcastProcessFunction<JSONObject, S
         }
         // 3。写入状态，广播出去
         BroadcastState<String, TableProcess> broadcastState = ctx.getBroadcastState(mapStateDescriptor);
-        String key = tableProcess.getSinkTable() + "-" + tableProcess.getOperateType();
+        String key = tableProcess.getSourceTable() + "-" + tableProcess.getOperateType();
         broadcastState.put(key, tableProcess);
     }
 

@@ -55,7 +55,7 @@ public class BaseDBApp {
                 .hostname("localhost")
                 .port(3306)
                 .databaseList("gmall-realtime")
-                .tableList("table_process") // 如果不添加该参数，则消费制定数据库中所有表的数据，如果制定，指定方式为table.name
+                .tableList("gmall-realtime.table_process") // 如果不添加该参数，则消费制定数据库中所有表的数据，如果制定，指定方式为table.name
                 .username("root")
                 .password("890728")
                 .deserializer(new JsonDebeziumDeserializationSchema())
