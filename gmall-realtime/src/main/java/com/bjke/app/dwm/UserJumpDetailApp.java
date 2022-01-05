@@ -63,20 +63,31 @@ public class UserJumpDetailApp {
                     }
                 }));
         // 4。定义模式序列
-        Pattern<JSONObject, JSONObject> pattern = Pattern.<JSONObject>begin("start").where(new SimpleCondition<JSONObject>() {
-            @Override
-            public boolean filter(JSONObject value) throws Exception {
-                String lastPageId = value.getJSONObject("page").getString("last_page_id");
-                return lastPageId == null || lastPageId.length() <= 0;
-            }
-        }).next("next").where(new SimpleCondition<JSONObject>() {
-            @Override
-            public boolean filter(JSONObject value) throws Exception {
-                String lastPageId = value.getJSONObject("page").getString("last_page_id");
-                return lastPageId == null || lastPageId.length() <= 0;
-            }
-        }).within(Time.seconds(10));
+//        Pattern<JSONObject, JSONObject> pattern = Pattern.<JSONObject>begin("start").where(new SimpleCondition<JSONObject>() {
+//            @Override
+//            public boolean filter(JSONObject value) throws Exception {
+//                String lastPageId = value.getJSONObject("page").getString("last_page_id");
+//                return lastPageId == null || lastPageId.length() <= 0;
+//            }
+//        }).next("next").where(new SimpleCondition<JSONObject>() {
+//            @Override
+//            public boolean filter(JSONObject value) throws Exception {
+//                String lastPageId = value.getJSONObject("page").getString("last_page_id");
+//                return lastPageId == null || lastPageId.length() <= 0;
+//            }
+//        }).within(Time.seconds(10));
 
+        // 使用循环模式 定义模式序列 替换上面的也行
+        Pattern<JSONObject, JSONObject> pattern = Pattern.<JSONObject>begin("start").where(new SimpleCondition<JSONObject>() {
+                    @Override
+                    public boolean filter(JSONObject value) throws Exception {
+                        String lastPageId = value.getJSONObject("page").getString("last_page_id");
+                        return lastPageId == null || lastPageId.length() <= 0;
+                    }
+                })
+                .times(2)
+                .consecutive() // 指定严格近邻（next）
+                .within(Time.seconds(10));
         // 5。将模式序列作用到流上
         PatternStream<JSONObject> pattern$ = CEP.pattern(jsonObjDS$
                 .keyBy(json -> json.getJSONObject("common").getString("mid")), pattern);
