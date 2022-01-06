@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
 import java.util.Properties;
 
 public class MyKafkaUtil {
-    private static final String brokers = "hadoop1:9092,hadoop2:9092,hadoop3:9092";
+    private static final String brokers = "hadoop1:9092";
     private static String default_topic = "DWD_DEFAULT_TOPIC";
 
     public static FlinkKafkaProducer<String> getKafkaProducer(String topic) {

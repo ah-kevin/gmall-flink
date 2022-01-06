@@ -25,7 +25,7 @@ public class BaseLogApp {
     public static void main(String[] args) throws Exception {
         // 1. 获取执行环境
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        env.setParallelism(1); //生产环境应该设置为Kafka主题的分区数
+        env.setParallelism(3); //生产环境应该设置为Kafka主题的分区数
         //2.Flink-CDC将读取binlog的位置信息以状态的方式保存在CK,如果想要做到断点续传,需要从Checkpoint或者Savepoint启动程序
         //2.1 开启Checkpoint,每隔5秒钟做一次CK
 //        env.enableCheckpointing(5000L);

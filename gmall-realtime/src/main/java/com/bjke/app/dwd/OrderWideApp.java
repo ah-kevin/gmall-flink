@@ -80,7 +80,16 @@ public class OrderWideApp {
                     }
                 });
         orderWideWithNoDimDS.print("orderWideWithNoDimDS>>>>>>");
-        // 4 关联维度信息
+        // 4 关联维度信息 hbase phoenix
+        orderWideWithNoDimDS.map(orderWide -> {
+            // 关联用户维度
+            Long user_id = orderWide.getUser_id();
+            // 根据user_id查询Phoenix用户信息
+
+            // 将用户信息补充至orderWide
+            // 返回结果
+            return orderWide;
+        });
 
         // 5 写入kafka
         env.execute("OrderWideApp");
