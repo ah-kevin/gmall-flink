@@ -2,6 +2,7 @@ package com.bjke.app.function;
 
 import com.alibaba.fastjson.JSONObject;
 import com.bjke.common.GmallConfig;
+import com.bjke.utils.DimUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
@@ -35,11 +36,17 @@ public class DimSinkFunction extends RichSinkFunction<JSONObject> {
     @Override
     public void invoke(JSONObject value, Context context) throws Exception {
         try {
+            String sinkTable = value.getString("sinkTable");
             // 获取sql语句
-            String upsertSql = genUpsertSql(value.getString("sinkTable"), value.getJSONObject("after"));
+            JSONObject after = value.getJSONObject("after");
+            String upsertSql = genUpsertSql(sinkTable, after);
             System.out.println(upsertSql);
             // 预编译SQL
             PreparedStatement preparedStatement = connection.prepareStatement(upsertSql);
+            // 判断如果当前数据为更新操作，则先删除redis中的数据
+            if ("u".equals(value.getString("op"))) {
+                DimUtil.delRedisDimInfo(sinkTable.toUpperCase(), after.getString("id"));
+            }
             // 执行插入操作
             preparedStatement.executeUpdate();
         } catch (SQLException e) {

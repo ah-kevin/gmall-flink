@@ -1,4 +1,4 @@
-package com.bjke.app.dwd;
+package com.bjke.app.dwm;
 
 import com.alibaba.fastjson.JSON;
 import com.bjke.bean.OrderDetail;
@@ -80,6 +80,7 @@ public class OrderWideApp {
                     }
                 });
         orderWideWithNoDimDS.print("orderWideWithNoDimDS>>>>>>");
+
         // 4 关联维度信息 hbase phoenix
         orderWideWithNoDimDS.map(orderWide -> {
             // 关联用户维度
@@ -87,6 +88,10 @@ public class OrderWideApp {
             // 根据user_id查询Phoenix用户信息
 
             // 将用户信息补充至orderWide
+            // 地区
+            // SKU
+            // SPU
+            // 。。。
             // 返回结果
             return orderWide;
         });
