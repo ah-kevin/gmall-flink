@@ -34,7 +34,7 @@ public class TableProcessFunction extends BroadcastProcessFunction<JSONObject, S
     public void open(Configuration parameters) throws Exception {
         Class.forName(GmallConfig.PHOENIX_DRIVER);
         connection = DriverManager.getConnection(GmallConfig.PHOENIX_SERVER);
-
+        //TODO: 读取MySQL配置表放入内存【Map】！
     }
 
     // value:{"db":"","ts_ms":{},"before":{},"after":{},"op":{},"source":{}}
@@ -81,6 +81,7 @@ public class TableProcessFunction extends BroadcastProcessFunction<JSONObject, S
                 ctx.output(outputTag, value);
             }
         } else {
+            //TODO: 从内存的Map中尝试获取数据
             System.out.println("该组合key:" + key + "不存在！");
         }
     }

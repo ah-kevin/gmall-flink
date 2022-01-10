@@ -16,10 +16,10 @@ public class DimUtil {
         String redisKey = "DIM:" + tableName + ":" + id;
         String dimInfoJsonStr = jedis.get(redisKey);
         if (dimInfoJsonStr != null) {
-            // 归还链接
-            jedis.close();
             // 重置过期时间
             jedis.expire(redisKey, 24 * 60 * 60L);
+            // 归还链接
+            jedis.close();
             // 返回结果
             return JSONObject.parseObject(dimInfoJsonStr);
         }
